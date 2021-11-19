@@ -7,17 +7,21 @@ healthy_data_struct =  load('data/healthy_data.mat');
 healthy_data = healthy_data_struct.healthy;
 
 
-[ecg_sig, result_array] = populate(ecg_sig,result_array,'1',24,unhealthy_data, healthy_data);
-[ecg_sig, result_array] = populate(ecg_sig,result_array,'2',34,unhealthy_data, healthy_data);
-
+ecg_sig_1, result_array_1 = populate(ecg_sig,result_array,'1',24,unhealthy_data, healthy_data);
+ecg_sig = ecg_sig_1;
+result_array = result_array_1;
+ecg_sig_1, result_array_1 = populate(ecg_sig,result_array,'2',34,unhealthy_data, healthy_data);
+ecg_sig = ecg_sig_1;
+result_array = result_array_1;
 
 t=(0:length(ecg_sig(1,:))-1)/Fs;
 plot(t, ecg_sig(1,:));
 actual_result = result_array(2:end);
 
 
-function [ecg, result] = populate(ecg, result, series, iter, ...
-    unhealthy, healthy)
+
+function ecg_sig_1, result_array_1 = populate(ecg, result, series, iter, ...
+    unhealthy, healthy);
     for i=1:iter
         if i < 10
             strname = strcat('0',int2str(i));
@@ -49,6 +53,7 @@ function [ecg, result] = populate(ecg, result, series, iter, ...
                 result(length(result)+1) = "healthy";  
             end
         end
-
     end
+    ecg_sig_1 = ecg;
+    result_array_1 = result;
 end
