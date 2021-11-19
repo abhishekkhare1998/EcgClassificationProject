@@ -15,6 +15,12 @@ t=(0:length(ecg_sig(1,:))-1)/Fs;
 plot(t, ecg_sig(1,:));
 actual_result = result_array(2:end);
 
+function [removed_avg] = remove_mean(signal)
+mean = sum(signal)/length(signal);
+for i = 1:length(signal)
+    removed_avg(i) = signal(i) - mean;
+end
+end
 
 function [ecg, result] = populate(ecg, result, series, iter, ...
     unhealthy, healthy)
@@ -36,7 +42,8 @@ function [ecg, result] = populate(ecg, result, series, iter, ...
             if int2str(unhealthy(ii,1)) == strcat(series, strname)
                 strt = unhealthy(ii,2) - 7200;
                 ending = unhealthy(ii,2) + 14400;
-                ecg = [ecg ;(a.val(1,strt:ending))/200];
+                [signal_of_interest] = remove_mean(a.val(1,strt:ending));
+                ecg = [ecg ; (signal_of_interest)/200];
                 result(length(result)+1) = "unhealthy";  
             end
         end

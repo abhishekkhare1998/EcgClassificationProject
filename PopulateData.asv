@@ -7,21 +7,26 @@ healthy_data_struct =  load('data/healthy_data.mat');
 healthy_data = healthy_data_struct.healthy;
 
 
-ecg_sig_1, result_array_1 = populate(ecg_sig,result_array,'1',24,unhealthy_data, healthy_data);
-ecg_sig = ecg_sig_1;
-result_array = result_array_1;
-ecg_sig_1, result_array_1 = populate(ecg_sig,result_array,'2',34,unhealthy_data, healthy_data);
-ecg_sig = ecg_sig_1;
-result_array = result_array_1;
+[ecg_sig, result_array] = populate(ecg_sig,result_array,'1',24,unhealthy_data, healthy_data);
+[ecg_sig, result_array] = populate(ecg_sig,result_array,'2',34,unhealthy_data, healthy_data);
+
 
 t=(0:length(ecg_sig(1,:))-1)/Fs;
 plot(t, ecg_sig(1,:));
 actual_result = result_array(2:end);
 
+function [removed_avg] = remove_mean(signal)
+mean = sum(signal)/length(signal);
+for i = 1:length(signal)
+    removed_avg(i) = signal(i) - mean;
+end
+i = 1;
+while(i < length())
 
+end
 
-function ecg_sig_1, result_array_1 = populate(ecg, result, series, iter, ...
-    unhealthy, healthy);
+function [ecg, result] = populate(ecg, result, series, iter, ...
+    unhealthy, healthy)
     for i=1:iter
         if i < 10
             strname = strcat('0',int2str(i));
@@ -40,7 +45,8 @@ function ecg_sig_1, result_array_1 = populate(ecg, result, series, iter, ...
             if int2str(unhealthy(ii,1)) == strcat(series, strname)
                 strt = unhealthy(ii,2) - 7200;
                 ending = unhealthy(ii,2) + 14400;
-                ecg = [ecg ;(a.val(1,strt:ending))/200];
+                [signal_of_interest] = remove_mean(a.val(1,strt:ending));
+                ecg = [ecg ; (signal_of_interest)/200];
                 result(length(result)+1) = "unhealthy";  
             end
         end
@@ -53,7 +59,6 @@ function ecg_sig_1, result_array_1 = populate(ecg, result, series, iter, ...
                 result(length(result)+1) = "healthy";  
             end
         end
+
     end
-    ecg_sig_1 = ecg;
-    result_array_1 = result;
 end
