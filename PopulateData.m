@@ -14,7 +14,7 @@ healthy_data = healthy_data_struct.healthy;
 t=(0:length(ecg_sig(1,:))-1)/Fs;
 plot(t, ecg_sig(1,:));
 actual_result = result_array(2:end);
-plot_all(ecg_sig);
+%plot_all(ecg_sig);
 %figure;
 %[psdest] = plot_fft(ecg_sig(1,:));
 
@@ -26,10 +26,10 @@ function [] = plot_all(signal_matrix)
 end
 
 function [processed_signal] = pre_processing(signal)
-%[removed_mean] = remove_mean(signal);
-[avg_signal] = remove_baseline(signal);
-[processed_signal] = lowpassfilter(avg_signal);
-
+%[processed_signal] = remove_mean(signal);
+%[processed_signal] = remove_baseline(signal);
+%[processed_signal] = lowpassfilter(avg_signal);
+processed_signal = signal;
 end
 
 function [filtered_signal] = lowpassfilter(signal)
