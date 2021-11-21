@@ -14,7 +14,7 @@ healthy_data = healthy_data_struct.healthy;
 t=(0:length(ecg_sig(1,:))-1)/Fs;
 plot(t, ecg_sig(1,:));
 actual_result = result_array(2:end);
-%plot_all(ecg_sig);
+plot_all(ecg_sig);
 %figure;
 %[psdest] = plot_fft(ecg_sig(1,:));
 
@@ -47,13 +47,13 @@ end
 function [removed_base] = remove_baseline(signal)
 removed_base = [];
 i = 1;
-incr = 50;
+incr = 300;
     while(i < length(signal))
         if i + incr > length(signal)
             incr = length(signal) - i;
         end
         local_mean = sum(signal(i:i+incr))/(incr+1);
-        for j = 1:length(signal)
+        for j = i:i+incr
             removed_base(j) = signal(j) - local_mean;
         end
         i = i + incr;
