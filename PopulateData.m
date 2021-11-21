@@ -27,8 +27,9 @@ end
 
 function [processed_signal] = pre_processing(signal)
 %[removed_mean] = remove_mean(signal);
-%[filtered_signal] = lowpassfilter(removed_mean);
-[processed_signal] = remove_baseline(signal);
+[avg_signal] = remove_baseline(signal);
+[processed_signal] = lowpassfilter(avg_signal);
+
 end
 
 function [filtered_signal] = lowpassfilter(signal)
