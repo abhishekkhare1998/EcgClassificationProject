@@ -14,9 +14,16 @@ healthy_data = healthy_data_struct.healthy;
 t=(0:length(ecg_sig(1,:))-1)/Fs;
 plot(t, ecg_sig(1,:));
 actual_result = result_array(2:end);
-
+%plot_all(ecg_sig);
 %figure;
 %[psdest] = plot_fft(ecg_sig(1,:));
+
+function [] = plot_all(signal_matrix)
+    for i = 1:73
+        figure;
+        plot(signal_matrix(i,:))
+    end
+end
 
 function [processed_signal] = pre_processing(signal)
 %[removed_mean] = remove_mean(signal);
@@ -38,13 +45,14 @@ end
 end
 
 function [removed_base] = remove_baseline(signal)
+removed_base = [];
 i = 1;
-incr = 2000;
+incr = 50;
     while(i < length(signal))
         if i + incr > length(signal)
             incr = length(signal) - i;
         end
-        local_mean = sum(signal(i:i+incr-1))/incr;
+        local_mean = sum(signal(i:i+incr))/(incr+1);
         for j = 1:length(signal)
             removed_base(j) = signal(j) - local_mean;
         end
@@ -84,7 +92,7 @@ function [ecg, result] = populate(ecg, result, series, iter, ...
             if int2str(unhealthy(ii,1)) == strcat(series, strname)
                 strt = unhealthy(ii,2) - 7200;
                 ending = unhealthy(ii,2) + 14400;
-                [signal_of_interest] = remove_mean(a.val(1,strt:ending));
+                [signal_of_interest] = pre_processing(a.val(1,strt:ending));
                 ecg = [ecg ; (signal_of_interest)/200];
                 result(length(result)+1) = "unhealthy";  
             end
@@ -94,7 +102,8 @@ function [ecg, result] = populate(ecg, result, series, iter, ...
             if int2str(healthy(ii,1)) == strcat(series, strname)
                 strt = healthy(ii,2);
                 ending = healthy(ii,3);
-                ecg = [ecg ;(a.val(1,strt:ending))/200];
+                [signal_of_interest] = pre_processing(a.val(1,strt:ending));
+                ecg = [ecg ; (signal_of_interest)/200];
                 result(length(result)+1) = "healthy";  
             end
         end
