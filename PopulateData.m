@@ -15,8 +15,6 @@ t=(0:length(ecg_sig(1,:))-1)/Fs;
 plot(t, ecg_sig(1,:));
 actual_result = result_array(2:end);
 
-<<<<<<< Updated upstream
-=======
 %figure;
 %[psdest] = plot_fft(ecg_sig(1,:));
 
@@ -31,7 +29,7 @@ lpf = load('filters/LP20.mat');
 filtered_signal = conv(signal, lpf.Hlp.Numerator);
 end
 
->>>>>>> Stashed changes
+
 function [removed_avg] = remove_mean(signal)
 mean = sum(signal)/length(signal);
 for i = 1:length(signal)
