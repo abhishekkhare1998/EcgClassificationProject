@@ -15,11 +15,55 @@ t=(0:length(ecg_sig(1,:))-1)/Fs;
 plot(t, ecg_sig(1,:));
 actual_result = result_array(2:end);
 
+<<<<<<< Updated upstream
+=======
+%figure;
+%[psdest] = plot_fft(ecg_sig(1,:));
+
+function [processed_signal] = pre_processing(signal)
+%[removed_mean] = remove_mean(signal);
+%[filtered_signal] = lowpassfilter(removed_mean);
+[processed_signal] = remove_baseline(signal);
+end
+
+function [filtered_signal] = lowpassfilter(signal)
+lpf = load('filters/LP20.mat');
+filtered_signal = conv(signal, lpf.Hlp.Numerator);
+end
+
+>>>>>>> Stashed changes
 function [removed_avg] = remove_mean(signal)
 mean = sum(signal)/length(signal);
 for i = 1:length(signal)
     removed_avg(i) = signal(i) - mean;
 end
+end
+
+function [removed_base] = remove_baseline(signal)
+i = 1;
+incr = 2000;
+    while(i < length(signal))
+        if i + incr > length(signal)
+            incr = length(signal) - i;
+        end
+        local_mean = sum(signal(i:i+incr-1))/incr;
+        for j = 1:length(signal)
+            removed_base(j) = signal(j) - local_mean;
+        end
+        i = i + incr;
+    end
+end
+
+function [psdest] = plot_fft(signal)
+    Fs = 360;
+    xdft = fft(signal);
+    xdft = xdft(1:length(signal)/2+1);
+    xdft(2:end-1) = 2*xdft(2:end-1);
+    psdest = 1/(length(signal)*Fs)*abs(xdft).^2;
+    freq = 0:Fs/length(signal):Fs/2;
+    figure;
+    plot(freq,psdest);
+
 end
 
 function [ecg, result] = populate(ecg, result, series, iter, ...
