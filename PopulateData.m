@@ -21,6 +21,15 @@ for i=1:length(actual_result)
     energy_mat = [energy_mat;transpose(wavelet_energy)];
 end
 
+%plot_all(ecg_sig)
+
+function [] = plot_all(signal_matrix)
+    for i = 1:73
+        figure;
+        plot(signal_matrix(i,:))
+    end
+end
+
 function [processed_signal] = pre_processing(signal)
 %[processed_signal] = remove_mean(signal);
 %[processed_signal] = remove_baseline(signal);
