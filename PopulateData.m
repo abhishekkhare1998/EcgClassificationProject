@@ -22,15 +22,22 @@ for i=1:length(actual_result)
 end
 
 function [processed_signal] = pre_processing(signal)
-%[removed_mean] = remove_mean(signal);
-[processed_signal] = remove_baseline(signal);
+%[processed_signal] = remove_mean(signal);
+%[processed_signal] = remove_baseline(signal);
 %[processed_signal] = lowpassfilter(removed_mean);
-
+processed_signal = signal;
 end
 
 function [filtered_signal] = lowpassfilter(signal)
 lpf = load('filters/LP20.mat');
 filtered_signal = conv(signal, lpf.Hlp.Numerator);
+end
+
+function [removed_avg] = remove_mean(signal)
+mean = sum(signal)/length(signal);
+for i = 1:length(signal)
+    removed_avg(i) = signal(i) - mean;
+end
 end
 
 function [removed_base] = remove_baseline(signal)
