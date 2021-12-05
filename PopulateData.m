@@ -18,16 +18,16 @@ actual_result = result_array(2:end);
 
 energy_mat = [];
 for i=1:length(actual_result)
-    [wavelet_energy] = compute_dwt('db2', 10, ecg_sig(i,:));
+    [wavelet_energy] = compute_dwt('db2', 8, ecg_sig(i,:));
     [wavelet_packet_decomposition] = compute_wpd('db2', 5, ecg_sig(i,:));
     energy_mat = [energy_mat;transpose(wavelet_energy)];
 end
 
 function [processed_signal] = pre_processing(signal)
 %[processed_signal] = remove_mean(signal);
-[processed_signal] = remove_baseline(signal);
+%[processed_signal] = remove_baseline(signal);
 %[processed_signal] = lowpassfilter(removed_mean);
-%processed_signal = signal;
+processed_signal = signal;
 end
 
 function [filtered_signal] = lowpassfilter(signal)
@@ -129,8 +129,10 @@ end
 
 function [wavelet_packet_decomposition] = compute_wpd(type, level, signal)
     wavelet_energy = [];
+    level = 8;
+    type = 'db2';
     wpt = wpdec(signal,level,type);
-    plot(wpt)
+    %%plot(wpt)
     j = 1;
     wavelet_packet_decomposition = 0;
 end
