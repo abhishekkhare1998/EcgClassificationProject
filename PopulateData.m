@@ -11,21 +11,27 @@ healthy_data = healthy_data_struct.healthy;
 [ecg_sig, result_array] = populate(ecg_sig,result_array,'2',34,unhealthy_data, healthy_data);
 
 
+
 t=(0:length(ecg_sig(1,:))-1)/Fs;
-plot(t, ecg_sig(1,:));
+% plot(t, ecg_sig(1,:));
 actual_result = result_array(2:end);
 
 energy_mat = [];
+wpd_energy=[];
 for i=1:length(actual_result)
-    [wavelet_energy] = compute_dwt('db2', 10, ecg_sig(i,:));
+    [wavelet_energy] = compute_dwt('db6', 10, ecg_sig(i,:));
+    [E_wpd] = compute_wpd('db6',5, ecg_sig(i,:));
     energy_mat = [energy_mat;transpose(wavelet_energy)];
+    wpd_energy = [wpd_energy E_wpd'];
+    A=wpd_energy(1:16,:);
+    A=A';
 end
 
 function [processed_signal] = pre_processing(signal)
 %[processed_signal] = remove_mean(signal);
-%[processed_signal] = remove_baseline(signal);
+[processed_signal] = remove_baseline(signal);
 %[processed_signal] = lowpassfilter(removed_mean);
-processed_signal = signal;
+%processed_signal = signal;
 end
 
 function [filtered_signal] = lowpassfilter(signal)
@@ -101,8 +107,35 @@ function [wavelet_energy] = compute_dwt(type, level, signal)
     wavelet_energy = [];
     [coefficients,len] = wavedec(signal,level,type);
     j = 1;
+    part_length = 360;
     for i = 1:length(len)-1
-        wavelet_energy = [wavelet_energy; sum(coefficients(j:j+len(i)-1).^2)/(len(i))];
+        %wavelet_energy = [wavelet_energy; sum(coefficients(j:j+len(i)-1).^2)/(len(i))];
+        [mini, meani, maxi] = compute_dwt_part(coefficients(j:j+len(i)-1));
+        parameter = max(meani-mini, maxi -meani)/meani;
+        wavelet_energy = [wavelet_energy; parameter];
     end
 
 end
+
+function [mini, meani, maxi] = compute_dwt_part(signal)
+partitions_num = 10;
+starting_value = 1;
+energy = [];
+partition_length = floor(length(signal)/partitions_num);
+for iter = 1:2*partitions_num -1
+    energy = [energy; sum(signal(starting_value:starting_value+partition_length-1).^2)/(partition_length)];
+    starting_value = starting_value + 0.5*partition_length;
+end
+mini = min(transpose(energy));
+meani = mean(energy);
+maxi = max(energy);
+end
+
+function [E] = compute_wpd(type, level, signal)
+    wpt = wpdec(signal,level,type);
+    E = wenergy(wpt);
+    %plot(wpt)
+    j = 1;
+    wavelet_packet_decomposition = 0;
+end
+
