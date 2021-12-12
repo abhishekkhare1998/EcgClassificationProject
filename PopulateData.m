@@ -13,21 +13,25 @@ healthy_data = healthy_data_struct.healthy;
 
 
 t=(0:length(ecg_sig(1,:))-1)/Fs;
-plot(t, ecg_sig(1,:));
+% plot(t, ecg_sig(1,:));
 actual_result = result_array(2:end);
 
 energy_mat = [];
+wpd_energy=[];
 for i=1:length(actual_result)
-    [wavelet_energy] = compute_dwt('db2', 8, ecg_sig(i,:));
-    [wavelet_packet_decomposition] = compute_wpd('db2', 5, ecg_sig(i,:));
+    [wavelet_energy] = compute_dwt('db6', 10, ecg_sig(i,:));
+    [E_wpd] = compute_wpd('db6',5, ecg_sig(i,:));
     energy_mat = [energy_mat;transpose(wavelet_energy)];
+    wpd_energy = [wpd_energy E_wpd'];
+    A=wpd_energy(1:16,:);
+    A=A';
 end
 
 function [processed_signal] = pre_processing(signal)
 %[processed_signal] = remove_mean(signal);
-%[processed_signal] = remove_baseline(signal);
+[processed_signal] = remove_baseline(signal);
 %[processed_signal] = lowpassfilter(removed_mean);
-processed_signal = signal;
+%processed_signal = signal;
 end
 
 function [filtered_signal] = lowpassfilter(signal)
@@ -127,12 +131,10 @@ meani = mean(energy);
 maxi = max(energy);
 end
 
-function [wavelet_packet_decomposition] = compute_wpd(type, level, signal)
-    wavelet_energy = [];
-    level = 8;
-    type = 'db2';
+function [E] = compute_wpd(type, level, signal)
     wpt = wpdec(signal,level,type);
-    %%plot(wpt)
+    E = wenergy(wpt);
+    %plot(wpt)
     j = 1;
     wavelet_packet_decomposition = 0;
 end
